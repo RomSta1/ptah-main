@@ -1,0 +1,4 @@
+yamspy
+onnxruntime
+numpy
+websockets==11.0.2
