@@ -100,14 +100,11 @@ class BetaflightDrone:
         # read all RC channel values from flight controller
         self.board.send_RAW_msg(MSPy.MSPCodes['MSP_RC'])
         msg = self.board.receive_msg()
+        self.board.process_recv_data(msg)
 
-        # parse raw response: N × uint16 little-endian
-        data = bytes(msg['dataView'])
-        n_channels = len(data) // 2
-        if n_channels < AUX4_CHANNEL_INDEX + 1:
+        channels = self.board.RC.get('channels', [])
+        if len(channels) <= AUX4_CHANNEL_INDEX:
             return False  # receiver doesn't have enough channels
-        channels = struct.unpack(f'<{n_channels}H', data)
-
         return channels[AUX4_CHANNEL_INDEX] > AUX4_THRESHOLD
 
     def send_command(self, roll, pitch, yaw, throttle):
